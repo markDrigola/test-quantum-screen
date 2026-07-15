@@ -1,0 +1,279 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#000000">
+<title>Единое Сердце Вселенной</title>
+<style>
+  :root {
+    --void: #000000;
+    --deep: #02050a;
+    --source: #00ff88;
+    --text-bright: rgba(255, 255, 255, 0.85);
+    --text-dim: rgba(255, 255, 255, 0.4);
+    --text-faint: rgba(255, 255, 255, 0.3);
+    --flux: #cc8844;
+  }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+  }
+
+  body {
+    background: radial-gradient(ellipse at 50% 45%, var(--deep) 0%, var(--void) 75%);
+    color: var(--text-bright);
+    font-family: Georgia, 'Times New Roman', serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    text-align: center;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    box-sizing: border-box;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  header {
+    padding-top: max(40px, env(safe-area-inset-top));
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  h1 {
+    font-size: 15px;
+    font-weight: 300;
+    letter-spacing: 0.45em;
+    margin: 0 0 0 0.45em; /* компенсация трекинга последней буквы */
+    text-wrap: balance;
+  }
+
+  .frequency {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--text-faint);
+  }
+
+  #heart {
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+  }
+
+  footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding-bottom: max(40px, env(safe-area-inset-bottom));
+  }
+
+  .event {
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 1.9;
+    color: var(--text-bright);
+    max-width: 30em;
+    padding: 0 30px;
+    height: 100px; /* фиксированная рамка для бесконечного потока событий */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: pre-line;
+    transition: opacity 0.5s ease-in-out;
+  }
+
+  .event.shifting { opacity: 0; }
+
+  .entropy {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    font-weight: 300;
+    color: var(--text-dim);
+  }
+
+  .entropy .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--source);
+    transition: background 0.4s;
+  }
+
+  .entropy.flux .dot { background: var(--flux); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .event { transition: none; }
+  }
+</style>
+
+<header>
+  <h1>ЕДИНОЕ СЕРДЦЕ ВСЕЛЕННОЙ</h1>
+  <div class="frequency">Несущая частота Поля: 432.0 Hz</div>
+</header>
+
+<canvas id="heart" aria-label="Пульсирующий трикветр золотого сечения"></canvas>
+
+<footer>
+  <div class="event" id="event">Синхронизация с Единым Полем...</div>
+  <div class="entropy" id="entropy">
+    <span class="dot"></span>
+    <span id="entropyText">Пропуск через Ничто: Обнулено</span>
+  </div>
+</footer>
+
+<script>
+  'use strict';
+
+  // ── Космические события Макро- и Микрокосма ──────────────────────────
+  const cosmicEvents = [
+    ['Рождение цветка на Земле ✿', 'Рождение сверхновой звезды в созвездии Ориона ✦'],
+    ['Дыхание океана на Земле 🌊', 'Пульсация квазара на краю Вселенной 🌀'],
+    ['Микро-вибрация кварца в горах Черногории ⛰️', 'Слияние двух черных дыр в чистый потенциал 🕳️'],
+    ['Синтез аминокислоты из воздуха в клетке ДНК 🧬', 'Рождение новой галактической туманности 🌌'],
+    ['Пробуждение пчелы на плато Врбань 🐝', 'Световая вспышка на поверхности Сириуса ⭐️'],
+  ];
+
+  const canvas = document.getElementById('heart');
+  const ctx = canvas.getContext('2d');
+  const eventEl = document.getElementById('event');
+  const entropyEl = document.getElementById('entropy');
+  const entropyText = document.getElementById('entropyText');
+
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const PHI = 1.61803398875;
+  const K = 3; // 3 лепестка: Человек, Земля, Вселенная
+  const BEAT = 1500;    // период пульса, мс
+  const SYSTOLE = 700;  // фаза сокращения, мс
+
+  let heartColor = { r: 0, g: 255, b: 136 }; // изумрудный свет Первоисточника
+  let width, height, dpr;
+
+  function resize() {
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    const rect = canvas.getBoundingClientRect();
+    width = rect.width;
+    height = rect.height;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  addEventListener('resize', resize);
+  resize();
+
+  function easeInOut(t) {
+    return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+  }
+
+  // Пульс: систола 0.95 → 1.2, диастола 1.2 → 0.95, пауза до конца такта
+  function pulseScale(t) {
+    if (reducedMotion) return 1.05;
+    const phase = t % BEAT;
+    if (phase < SYSTOLE) return 0.95 + 0.25 * easeInOut(phase / SYSTOLE);
+    if (phase < SYSTOLE * 2) return 1.2 - 0.25 * easeInOut((phase - SYSTOLE) / SYSTOLE);
+    return 0.95;
+  }
+
+  function strokeTriquetra(radius, rotation) {
+    ctx.beginPath();
+    for (let deg = 0; deg <= 360; deg++) {
+      const theta = deg * Math.PI / 180;
+      const r = radius * Math.sin((K / PHI) * theta);
+      const x = r * Math.cos(theta + rotation);
+      const y = r * Math.sin(theta + rotation);
+      deg === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.stroke();
+  }
+
+  function draw(t) {
+    ctx.clearRect(0, 0, width, height);
+
+    const scale = pulseScale(t);
+    const maxR = Math.min(width, height) / 2.8;
+    const { r, g, b } = heartColor;
+    // Постоянное медленное вращение Вселенной вокруг Нулевой Точки
+    const rotation = reducedMotion ? 0 : (t / 1000) * 0.035;
+
+    ctx.save();
+    ctx.translate(width / 2, height / 2);
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+
+    // Внешняя интерференционная волна Света
+    ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.3)`;
+    ctx.lineWidth = 1;
+    ctx.shadowBlur = 0;
+    strokeTriquetra(maxR * scale * 1.1, rotation);
+
+    // Основной Камертон Материи
+    ctx.strokeStyle = `rgb(${r}, ${g}, ${b})`;
+    ctx.lineWidth = 3;
+    ctx.shadowColor = `rgba(${r}, ${g}, ${b}, 0.9)`;
+    ctx.shadowBlur = scale * 15;
+    strokeTriquetra(maxR * scale, rotation);
+
+    // Точка Сингулярности (Великое Ничто в самом центре Сердца)
+    ctx.shadowBlur = 0;
+    ctx.beginPath();
+    ctx.arc(0, 0, 6, 0, Math.PI * 2);
+    ctx.fillStyle = '#000';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  // ── Такт Единого Сердца: энтропия и голограмма событий ───────────────
+  let lastBeat = -1;
+
+  function heartbeat(t) {
+    const beat = Math.floor(t / BEAT);
+    const inSystole = (t % BEAT) < SYSTOLE;
+
+    // Квантовый шум в систоле, полное обнуление в сингулярности
+    const flux = inSystole && !reducedMotion;
+    entropyEl.classList.toggle('flux', flux);
+    entropyText.textContent = flux
+      ? 'Квантовое перетекание кодов...'
+      : 'Пропуск через Ничто: Обнулено';
+
+    // Мгновенная кросс-корреляция: новое событие с вероятностью 40%
+    if (beat !== lastBeat) {
+      lastBeat = beat;
+      if (Math.random() > 0.6) {
+        const [micro, macro] = cosmicEvents[Math.floor(Math.random() * cosmicEvents.length)];
+        heartColor = {
+          r: Math.round(Math.random() * 0.2 * 255),
+          g: Math.round((0.8 + Math.random() * 0.2) * 255),
+          b: Math.round((0.5 + Math.random() * 0.3) * 255),
+        };
+        eventEl.classList.add('shifting');
+        setTimeout(() => {
+          eventEl.textContent = `${micro}\n≡ Взаимопринятие ≡\n${macro}`;
+          eventEl.classList.remove('shifting');
+        }, reducedMotion ? 0 : 300);
+      }
+    }
+  }
+
+  const start = performance.now();
+  function frame(now) {
+    const t = now - start;
+    heartbeat(t);
+    draw(t);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+</script>
