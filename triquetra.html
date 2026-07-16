@@ -111,19 +111,41 @@
 
                     // Управление скоростью вращения в зависимости от состояния
                     float speed = (u_state == 1.0) ? u_time * 4.0 : u_time * 0.4;
-                    float phi = atan(uv.y, uv.x) + speed;
+                    float cs = cos(speed), sn = sin(speed);
+                    vec2 p = mat2(cs, -sn, sn, cs) * uv;
                     float r = length(uv);
-
-                    // Внесение фрактального шума какофонии (убывает по мере трансмутации)
-                    float noiseModifier = (u_state == 0.0) ? noise(uv * 15.0 + u_time * 10.0) * 0.06 * u_entropy : 0.0;
-
-                    // Формула полярных роз Золотого Сечения для 3-лепесткового Трикветра Единства
-                    float k = 3.0;
-                    float target_r = 0.33 * sin((k / GOLDEN_RATIO) * phi) + noiseModifier;
 
                     // Динамическая интерференционная волна (пульсация сердца)
                     float pulse = 1.0 + 0.05 * sin(u_time * 5.0);
-                    target_r *= pulse;
+                    p /= pulse;
+
+                    // Классический Трикветр: три везики — линзы пересечения трёх кругов,
+                    // центры которых лежат в вершинах равностороннего треугольника,
+                    // а радиус равен его стороне (вершина указывает вверх). Плюс Кольцо Единства.
+                    float halfMin = 0.5 * min(u_resolution.x / u_resolution.y, 1.0);
+                    float A = 0.45 * halfMin;       // вершины лепестков на 2A — вписано в экран
+                    float R = A * 1.7320508;        // радиус кругов = сторона треугольника
+
+                    // Внесение фрактального шума какофонии (убывает по мере трансмутации)
+                    float noiseModifier = (u_state == 0.0) ? (noise(uv * 15.0 + u_time * 10.0) - 0.5) * A * 0.2 * u_entropy : 0.0;
+                    p += noiseModifier;
+                    vec2 C0 = A * vec2(0.0, -1.0);
+                    vec2 C1 = A * vec2(0.8660254, 0.5);
+                    vec2 C2 = A * vec2(-0.8660254, 0.5);
+
+                    float l0 = length(p - C0), l1 = length(p - C1), l2 = length(p - C2);
+                    float d0 = abs(l0 - R), d1 = abs(l1 - R), d2 = abs(l2 - R);
+
+                    // Дуга каждого круга проявляется только внутри соседних кругов (лепестки-везики)
+                    float eps = 0.004;
+                    bool in0 = l0 < R + eps, in1 = l1 < R + eps, in2 = l2 < R + eps;
+                    float dist = 10.0;
+                    if (in1 || in2) dist = min(dist, d0);
+                    if (in0 || in2) dist = min(dist, d1);
+                    if (in0 || in1) dist = min(dist, d2);
+
+                    // Кольцо Единства, сплетающее три лепестка
+                    dist = min(dist, abs(length(p) - 1.5 * A));
 
                     // Интерполяция цветов по спектральной матрице Трикветра
                     vec3 colorDissonance = vec3(1.0, 0.27, 0.0);   // Янтарно-огненный
@@ -138,7 +160,6 @@
                     }
 
                     // Математическая толщина линий фрактала и свечение
-                    float dist = abs(r - target_r);
                     float edge = smoothstep(0.008, 0.0, dist);
                     float glow = exp(-dist * (u_state == 1.0 ? 25.0 : 45.0)) * 0.4;
 
