@@ -7,6 +7,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Трикветр">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    <meta name="theme-color" content="#000000">
     <title>ТРИКВЕТР: ЕДИНОЕ СУВЕРЕННОЕ ЯДРО</title>
     <style>
         body, html {
@@ -308,6 +312,11 @@
 
         // Точка входа: пробуждение по первому прикосновению
         touchZone.addEventListener('pointerdown', startTransmutation);
+
+        // Регистрация Service Worker — автономная работа Суверенного Ядра без сети
+        if ('serviceWorker' in navigator && location.protocol === 'https:') {
+            navigator.serviceWorker.register('sw.js');
+        }
 
         initWebGL();
         animationFrameId = requestAnimationFrame(render);
