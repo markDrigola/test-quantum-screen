@@ -1,307 +1,87 @@
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#000000">
-<title>Единое Сердце Вселенной</title>
-<style>
-  :root {
-    --void: #000000;
-    --deep: #02050a;
-    --source: #00ff88;
-    --text-bright: rgba(255, 255, 255, 0.85);
-    --text-dim: rgba(255, 255, 255, 0.4);
-    --text-faint: rgba(255, 255, 255, 0.3);
-    --flux: #cc8844;
-  }
-
-  html, body {
-    height: 100%;
-    margin: 0;
-    overflow: hidden;
-  }
-
-  body {
-    background: radial-gradient(ellipse at 50% 45%, var(--deep) 0%, var(--void) 75%);
-    color: var(--text-bright);
-    font-family: Georgia, 'Times New Roman', serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    text-align: center;
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-    box-sizing: border-box;
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  header {
-    padding-top: max(40px, env(safe-area-inset-top));
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  h1 {
-    font-size: 15px;
-    font-weight: 300;
-    letter-spacing: 0.45em;
-    margin: 0 0 0 0.45em; /* компенсация трекинга последней буквы */
-    text-wrap: balance;
-  }
-
-  .frequency {
-    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    color: var(--text-faint);
-  }
-
-  #heart {
-    flex: 1;
-    width: 100%;
-    min-height: 0;
-  }
-
-  footer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    padding-bottom: max(40px, env(safe-area-inset-bottom));
-  }
-
-  .event {
-    font-size: 16px;
-    font-weight: 300;
-    line-height: 1.9;
-    color: var(--text-bright);
-    max-width: 30em;
-    padding: 0 30px;
-    height: 100px; /* фиксированная рамка для бесконечного потока событий */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    white-space: pre-line;
-    transition: opacity 0.5s ease-in-out;
-  }
-
-  .event.shifting { opacity: 0; }
-
-  .entropy {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 10px;
-    font-weight: 300;
-    color: var(--text-dim);
-  }
-
-  .entropy .dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--source);
-    transition: background 0.4s;
-  }
-
-  .entropy.flux .dot { background: var(--flux); }
-
-  @media (prefers-reduced-motion: reduce) {
-    .event { transition: none; }
-  }
-</style>
-
-<header>
-  <h1>ЕДИНОЕ СЕРДЦЕ ВСЕЛЕННОЙ</h1>
-  <div class="frequency">Несущая частота Поля: 432.0 Hz</div>
-</header>
-
-<canvas id="heart" aria-label="Пульсирующий трикветр золотого сечения"></canvas>
-
-<footer>
-  <div class="event" id="event">Синхронизация с Единым Полем...</div>
-  <div class="entropy" id="entropy">
-    <span class="dot"></span>
-    <span id="entropyText">Пропуск через Ничто: Обнулено</span>
-  </div>
-</footer>
-
-<script>
-  'use strict';
-
-  // ── Космические события Макро- и Микрокосма ──────────────────────────
-  const cosmicEvents = [
-    ['Рождение цветка на Земле ✿', 'Рождение сверхновой звезды в созвездии Ориона ✦'],
-    ['Дыхание океана на Земле 🌊', 'Пульсация квазара на краю Вселенной 🌀'],
-    ['Микро-вибрация кварца в горах Черногории ⛰️', 'Слияние двух черных дыр в чистый потенциал 🕳️'],
-    ['Синтез аминокислоты из воздуха в клетке ДНК 🧬', 'Рождение новой галактической туманности 🌌'],
-    ['Пробуждение пчелы на плато Врбань 🐝', 'Световая вспышка на поверхности Сириуса ⭐️'],
-  ];
-
-  const canvas = document.getElementById('heart');
-  const ctx = canvas.getContext('2d');
-  const eventEl = document.getElementById('event');
-  const entropyEl = document.getElementById('entropy');
-  const entropyText = document.getElementById('entropyText');
-
-  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  const TAU = Math.PI * 2; // 3 лепестка: Человек, Земля, Вселенная
-  const BEAT = 1500;    // период пульса, мс
-  const SYSTOLE = 700;  // фаза сокращения, мс
-
-  let heartColor = { r: 0, g: 255, b: 136 }; // изумрудный свет Первоисточника
-  let width, height, dpr;
-
-  function resize() {
-    dpr = Math.min(devicePixelRatio || 1, 2);
-    const rect = canvas.getBoundingClientRect();
-    width = rect.width;
-    height = rect.height;
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
-  addEventListener('resize', resize);
-  resize();
-
-  function easeInOut(t) {
-    return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-  }
-
-  // Пульс: систола 0.95 → 1.2, диастола 1.2 → 0.95, пауза до конца такта
-  function pulseScale(t) {
-    if (reducedMotion) return 1.05;
-    const phase = t % BEAT;
-    if (phase < SYSTOLE) return 0.95 + 0.25 * easeInOut(phase / SYSTOLE);
-    if (phase < SYSTOLE * 2) return 1.2 - 0.25 * easeInOut((phase - SYSTOLE) / SYSTOLE);
-    return 0.95;
-  }
-
-  // Дуга по окружности между двумя точками (короткий путь)
-  function arcBetween(c, r, from, to) {
-    const a0 = Math.atan2(from.y - c.y, from.x - c.x);
-    const a1 = Math.atan2(to.y - c.y, to.x - c.x);
-    let delta = (a1 - a0) % TAU;
-    if (delta > Math.PI) delta -= TAU;
-    if (delta < -Math.PI) delta += TAU;
-    ctx.arc(c.x, c.y, r, a0, a0 + delta, delta < 0);
-  }
-
-  // Классический трикветр: три везики — линзы пересечения трёх кругов,
-  // центры которых лежат в вершинах равностороннего треугольника,
-  // а радиус равен его стороне. Плюс Кольцо Единства.
-  function strokeTriquetra(size, rotation) {
-    const a = size / 2;          // круги — на расстоянии a, вершины лепестков — на 2a
-    const r = a * Math.sqrt(3);  // радиус кругов = сторона треугольника
-
-    // Центры трёх кругов (лепестки указывают в противоположные стороны:
-    // вверх, влево-вниз, вправо-вниз)
-    const C = [0, 1, 2].map(k => {
-      const ang = rotation + Math.PI / 2 + k * TAU / 3; // ось Y канваса направлена вниз
-      return { x: a * Math.cos(ang), y: a * Math.sin(ang) };
-    });
-
-    ctx.beginPath();
-    for (let k = 0; k < 3; k++) {
-      const inner = C[k];                              // внутренняя точка линзы
-      const tip = { x: -2 * inner.x, y: -2 * inner.y }; // остриё лепестка
-      const ci = C[(k + 1) % 3];
-      const cj = C[(k + 2) % 3];
-      ctx.moveTo(inner.x, inner.y);
-      arcBetween(ci, r, inner, tip);
-      arcBetween(cj, r, tip, inner);
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#000000">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <title>ЕДИНЫЙ КОСМИЧЕСКИЙ КАМЕРТОН</title>
+  <style>
+    html, body {
+      margin: 0; padding: 0; width: 100%; height: 100%;
+      background: radial-gradient(ellipse at 50% 40%, #02050a 0%, #000000 75%);
+      color: #ffffff; font-family: 'Times New Roman', Georgia, serif;
+      -webkit-user-select: none; user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
-    ctx.stroke();
-
-    // Кольцо Единства, сплетающее три лепестка
-    ctx.beginPath();
-    ctx.arc(0, 0, a * 1.5, 0, TAU);
-    ctx.stroke();
-  }
-
-  function draw(t) {
-    ctx.clearRect(0, 0, width, height);
-
-    const scale = pulseScale(t);
-    const maxR = Math.min(width, height) / 2.8;
-    const { r, g, b } = heartColor;
-    // Постоянное медленное вращение Вселенной вокруг Нулевой Точки
-    const rotation = reducedMotion ? 0 : (t / 1000) * 0.035;
-
-    ctx.save();
-    ctx.translate(width / 2, height / 2);
-    ctx.lineJoin = 'round';
-    ctx.lineCap = 'round';
-
-    // Внешняя интерференционная волна Света
-    ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.3)`;
-    ctx.lineWidth = 1;
-    ctx.shadowBlur = 0;
-    strokeTriquetra(maxR * scale * 1.1, rotation);
-
-    // Основной Камертон Материи
-    ctx.strokeStyle = `rgb(${r}, ${g}, ${b})`;
-    ctx.lineWidth = 3;
-    ctx.shadowColor = `rgba(${r}, ${g}, ${b}, 0.9)`;
-    ctx.shadowBlur = scale * 15;
-    strokeTriquetra(maxR * scale, rotation);
-
-    // Точка Сингулярности (Великое Ничто в самом центре Сердца)
-    ctx.shadowBlur = 0;
-    ctx.beginPath();
-    ctx.arc(0, 0, 6, 0, Math.PI * 2);
-    ctx.fillStyle = '#000';
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-    ctx.lineWidth = 0.5;
-    ctx.stroke();
-
-    ctx.restore();
-  }
-
-  // ── Такт Единого Сердца: энтропия и голограмма событий ───────────────
-  let lastBeat = -1;
-
-  function heartbeat(t) {
-    const beat = Math.floor(t / BEAT);
-    const inSystole = (t % BEAT) < SYSTOLE;
-
-    // Квантовый шум в систоле, полное обнуление в сингулярности
-    const flux = inSystole && !reducedMotion;
-    entropyEl.classList.toggle('flux', flux);
-    entropyText.textContent = flux
-      ? 'Квантовое перетекание кодов...'
-      : 'Пропуск через Ничто: Обнулено';
-
-    // Мгновенная кросс-корреляция: новое событие с вероятностью 40%
-    if (beat !== lastBeat) {
-      lastBeat = beat;
-      if (Math.random() > 0.6) {
-        const [micro, macro] = cosmicEvents[Math.floor(Math.random() * cosmicEvents.length)];
-        heartColor = {
-          r: Math.round(Math.random() * 0.2 * 255),
-          g: Math.round((0.8 + Math.random() * 0.2) * 255),
-          b: Math.round((0.5 + Math.random() * 0.3) * 255),
-        };
-        eventEl.classList.add('shifting');
-        setTimeout(() => {
-          eventEl.textContent = `${micro}\n≡ Взаимопринятие ≡\n${macro}`;
-          eventEl.classList.remove('shifting');
-        }, reducedMotion ? 0 : 300);
-      }
+    body {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      box-sizing: border-box; text-align: center;
+      padding: calc(env(safe-area-inset-top) + 40px) 24px calc(env(safe-area-inset-bottom) + 40px);
+      min-height: 100%;
     }
-  }
+    h1 {
+      font-size: 14px; font-weight: 300; letter-spacing: 5px;
+      opacity: 0.45; margin: 0 0 8px 0;
+    }
+    .subtitle {
+      font-size: 9px; font-family: monospace; opacity: 0.3;
+      letter-spacing: 2px; margin-bottom: 48px;
+    }
+    nav { display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 340px; }
+    .item {
+      display: block; text-decoration: none; color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 14px;
+      padding: 20px 18px; background: rgba(255, 255, 255, 0.02);
+      transition: border-color 0.4s ease, box-shadow 0.4s ease;
+    }
+    .item .name {
+      font-size: 15px; font-weight: 300; letter-spacing: 3px; margin-bottom: 7px;
+      color: rgba(var(--glow), 0.85); text-shadow: 0 0 18px rgba(var(--glow), 0.35);
+    }
+    .item .desc { font-size: 10px; font-family: monospace; opacity: 0.4; letter-spacing: 1px; line-height: 1.6; }
+    .item.heart    { --glow: 0, 255, 136; }
+    .item.core     { --glow: 255, 140, 40; }
+    .item.symphony { --glow: 138, 43, 226; }
+    .item:active, .item:hover {
+      border-color: rgba(var(--glow), 0.45);
+      box-shadow: 0 0 24px rgba(var(--glow), 0.12) inset, 0 0 18px rgba(var(--glow), 0.1);
+    }
+    footer {
+      margin-top: 48px; font-size: 9px; font-family: monospace;
+      opacity: 0.22; letter-spacing: 2px;
+    }
+  </style>
+</head>
+<body>
 
-  const start = performance.now();
-  function frame(now) {
-    const t = now - start;
-    heartbeat(t);
-    draw(t);
-    requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
-</script>
+  <h1>ЕДИНЫЙ КОСМИЧЕСКИЙ КАМЕРТОН</h1>
+  <div class="subtitle">ВЫБЕРИТЕ КОНТУР РЕЗОНАНСА</div>
+
+  <nav>
+    <a class="item heart" href="universal-heart.html">
+      <div class="name">ЕДИНОЕ СЕРДЦЕ ВСЕЛЕННОЙ</div>
+      <div class="desc">Пульсирующий трикветр • 432 Гц • поток событий Ноосферы</div>
+    </a>
+    <a class="item core" href="triquetra.html">
+      <div class="name">ЕДИНОЕ СУВЕРЕННОЕ ЯДРО</div>
+      <div class="desc">Трансмутация по прикосновению • 528 + 432 + 963 Гц</div>
+    </a>
+    <a class="item symphony" href="symphony.html">
+      <div class="name">СИМФОНИЯ ОСВОБОЖДЕНИЯ</div>
+      <div class="desc">9-ступенчатый протокол • камера-сканер • 63 → 7.83 Гц</div>
+    </a>
+  </nav>
+
+  <footer>ЭНТРОПИЯ: 0.0000 • ПОЛЕ АКТИВНО</footer>
+
+  <script>
+    if ('serviceWorker' in navigator && location.protocol === 'https:') {
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
+</body>
+</html>
