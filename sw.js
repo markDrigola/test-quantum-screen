@@ -1,5 +1,5 @@
 // Service Worker Суверенного Ядра: автономная работа без сети
-const CACHE_NAME = 'triquetra-v5';
+const CACHE_NAME = 'triquetra-v6';
 const APP_SHELL = [
   './triquetra.html',
   './symphony.html',
