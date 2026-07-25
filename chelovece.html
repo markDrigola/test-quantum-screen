@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <!-- Метатеги для развертывания PWA на iPhone -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ЧелоВече">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    <meta name="theme-color" content="#000000">
+    <title>ЧЕ-Л-О-ВЕ-ЧЕ: Гимн Жизни Проявленной Любви</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #010206 0%, #030612 100%);
+            color: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .menu-back {
+            position: fixed; top: calc(env(safe-area-inset-top) + 14px); left: 16px;
+            z-index: 10; width: 40px; height: 40px; line-height: 38px;
+            text-align: center; border-radius: 50%;
+            color: rgba(255, 255, 255, 0.55); border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.35);
+            text-decoration: none; font-size: 20px; font-family: monospace;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 36px;
+            padding: 25px 20px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.85);
+            backdrop-filter: blur(30px);
+            text-align: center;
+        }
+        h1 {
+            font-size: 26px;
+            font-weight: 200;
+            letter-spacing: 6px;
+            margin: 0 0 5px 0;
+            color: #ffffff;
+        }
+        .subtitle {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #475569;
+            margin-bottom: 15px;
+        }
+
+        .triquetra-container {
+            width: 130px;
+            height: 130px;
+            margin: 0 auto 15px auto;
+            position: relative;
+            filter: drop-shadow(0 0 8px rgba(234, 179, 8, 0.05));
+            transition: filter 0.5s ease;
+        }
+        .triquetra-svg { width: 100%; height: 100%; }
+        .tri-path { fill: none; stroke: rgba(255, 255, 255, 0.08); stroke-width: 2.2; transition: all 0.5s ease; }
+        .tri-center { fill: none; stroke: rgba(255, 255, 255, 0.12); stroke-width: 2; transition: all 0.5s ease; }
+
+        /* Золотой Портал Осознанной Любви */
+        .love-portal-btn {
+            background: rgba(234, 179, 8, 0.02);
+            border: 1px solid rgba(234, 179, 8, 0.15);
+            border-radius: 16px;
+            padding: 16px;
+            margin: 0 auto 20px auto;
+            width: 90%;
+            cursor: pointer;
+            color: #eab308;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.4s ease;
+            box-shadow: inset 0 0 10px rgba(234, 179, 8, 0.01);
+        }
+        .love-portal-btn.active {
+            background: rgba(234, 179, 8, 0.15);
+            border-color: #eab308;
+            color: #ffffff;
+            box-shadow: 0 0 25px rgba(234, 179, 8, 0.25), inset 0 0 15px rgba(234, 179, 8, 0.1);
+            text-shadow: 0 0 8px rgba(255,255,255,0.7);
+        }
+
+        .wave-field { font-size: 15px; font-weight: bold; color: #334155; letter-spacing: 8px; margin-bottom: 15px; transition: all 0.5s ease; }
+        .section-title { font-size: 8.5px; text-transform: uppercase; letter-spacing: 2px; color: #475569; margin: 12px 0 6px 0; text-align: left; padding-left: 5px; }
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.005);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 10px 2px;
+            color: #475569;
+            font-size: 9px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn span { font-size: 13px; font-weight: 600; color: #94a3b8; margin-bottom: 2px; }
+        .btn:active, .btn.active { background: rgba(56, 189, 248, 0.1); border-color: #38bdf8; color: #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.15); }
+        .btn.active span { color: #38bdf8; }
+
+        .btn.semantic { background: rgba(236, 72, 153, 0.005); border-color: rgba(236, 72, 153, 0.04); }
+        .btn.semantic:active, .btn.semantic.active { background: rgba(236, 72, 153, 0.1); border-color: #ec4899; color: #ec4899; box-shadow: 0 0 10px rgba(236, 72, 153, 0.15); }
+        .btn.semantic.active span { color: #ec4899; }
+
+        .master-panel { margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 15px; }
+        .action-btn { background: #38bdf8; color: #02040a; border: none; border-radius: 50%; width: 56px; height: 56px; font-size: 11px; font-weight: bold; cursor: pointer; box-shadow: 0 0 15px rgba(56, 189, 248, 0.25); transition: all 0.3s ease; text-transform: uppercase; }
+        .status { font-size: 9.5px; color: #475569; margin-top: 12px; min-height: 14px; font-style: italic; }
+    </style>
+</head>
+<body>
+
+<a class="menu-back" href="./" aria-label="Меню">←</a>
+
+<div class="container">
+    <h1>ЧЕ-Л-О-ВЕ-ЧЕ</h1>
+    <div class="subtitle">Гимн Жизни Проявленной Любви</div>
+
+    <div class="triquetra-container" id="triContainer">
+        <svg class="triquetra-svg" viewBox="0 0 100 100">
+            <path class="tri-path" id="pTop" d="M 50,15 A 26,26 0 0,1 68.3,58.3 A 26,26 0 0,1 31.7,58.3 A 26,26 0 0,1 50,15 Z" />
+            <path class="tri-path" id="pLeft" d="M 31.7,46.7 A 26,26 0 0,1 73.3,46.7 A 26,26 0 0,1 55,78.3 A 26,26 0 0,1 31.7,46.7 Z" />
+            <path class="tri-path" id="pRight" d="M 68.3,46.7 A 26,26 0 0,1 45,78.3 A 26,26 0 0,1 26.7,46.7 A 26,26 0 0,1 68.3,46.7 Z" />
+            <circle class="tri-center" id="pCenter" cx="50" cy="50" r="7" />
+        </svg>
+    </div>
+
+    <!-- ЗОЛОТОЙ ПОРТАЛ -->
+    <div class="love-portal-btn" id="lovePortal" onclick="toggleLovePortal(this)">
+        АККОРД ЛЮБВИ (СИГНАЛ 1986)
+    </div>
+
+    <div class="wave-field" id="wField">2 - 4 - 8</div>
+
+    <div class="section-title">Раскрытие Мелодии (ДО-МИ-НО)</div>
+    <div class="grid">
+        <div class="btn" id="b130" onclick="toggleFreq(this, 130.81, 'ДО', 'top')"><span>ДО</span>130.8 Гц</div>
+        <div class="btn" id="b164" onclick="toggleFreq(this, 164.81, 'МИ', 'top')"><span>МИ</span>164.8 Гц</div>
+        <div class="btn" id="b110" onclick="toggleFreq(this, 110.00, 'НО', 'left')"><span>НО</span>110.0 Гц</div>
+        <div class="btn" id="b146" onclick="toggleFreq(this, 146.83, 'РЕ', 'left')"><span>РЕ</span>146.8 Гц</div>
+        <div class="btn" id="b174" onclick="toggleFreq(this, 174.61, 'ФА', 'right')"><span>ФА</span>174.6 Гц</div>
+        <div class="btn" id="b246" onclick="toggleFreq(this, 246.94, 'СИ', 'right')"><span>СИ</span>246.9 Гц</div>
+        <div class="btn" id="b220" onclick="toggleFreq(this, 220.00, 'ЛЯ', 'right')"><span>ЛЯ</span>220.0 Гц</div>
+    </div>
+
+    <div class="section-title">Высший Квадрант Созвучия</div>
+    <div class="grid">
+        <div class="btn semantic" id="b528" onclick="toggleFreq(this, 528, 'ЛЮ', 'center')"><span>ЛЮ</span>Любовь</div>
+        <div class="btn semantic" id="b963" onclick="toggleFreq(this, 963, 'БО', 'center')"><span>БО</span>Ничто</div>
+        <div class="btn semantic" id="b432" onclick="toggleFreq(this, 432, 'ЧЕ', 'center')"><span>ЧЕ</span>ЧелоВече</div>
+        <div class="btn semantic" id="b108" onclick="toggleFreq(this, 108, 'ЛО', 'center')"><span>ЛО</span>Лоно</div>
+    </div>
+
+    <div class="section-title">Единый Микробиом и Земля</div>
+    <div class="grid grid-3">
+        <div class="btn" id="b7" onclick="toggleFreq(this, 7.83, 'Шуман', 'left')"><span>7.83 Гц</span>Земля</div>
+        <div class="btn" onclick="toggleFreq(this, 9, 'Органы', 'right')"><span>9 Гц</span>Альфа</div>
+        <div class="btn" onclick="toggleFreq(this, 54, 'Органы', 'top')"><span>54 Гц</span>Баланс</div>
+        <div class="btn" onclick="toggleFreq(this, 63, 'Органы', 'top')"><span>63 Гц</span>Гармония</div>
+        <div class="btn" onclick="toggleFreq(this, 120, 'Органы', 'center')"><span>120 Гц</span>Синхрон</div>
+        <div class="btn" onclick="toggleFreq(this, 295.8, 'Матрица', 'center')"><span>295.8 Гц</span>БиоПоле</div>
+    </div>
+
+    <div class="master-panel">
+        <button class="action-btn" id="mBtn" onclick="toggleMaster()">Вкл</button>
+        <div class="status" id="status">Точка Нуля готова к Со-Творению</div>
+    </div>
+</div>
+
+<script>
+    let ctx = null; let nodes = {}; let masterOn = false;
+    let activeSectors = { top: 0, left: 0, right: 0, center: 0 };
+    let lovePortalActive = false;
+
+    function init() {
+        if (!ctx) { ctx = new (window.AudioContext || window.webkitAudioContext)(); }
+        if (ctx.state === 'suspended') { ctx.resume(); }
+    }
+
+    function toggleFreq(el, hz, code, sector, silent = false) {
+        init(); if (!masterOn) { toggleMaster(); }
+        if (nodes[hz]) {
+            nodes[hz].osc.stop(); nodes[hz].gain.disconnect(); delete nodes[hz];
+            if(el) el.classList.remove('active'); activeSectors[sector]--;
+            if(!silent) showStatus(`Вибрация [${code}] возвращена в потенциал`);
+        } else {
+            let osc = ctx.createOscillator(); let gain = ctx.createGain();
+            osc.type = 'sine'; osc.frequency.setValueAtTime(hz, ctx.currentTime);
+            let vol = hz < 10 ? 0.35 : (hz > 500 ? 0.025 : 0.05);
+            gain.gain.setValueAtTime(vol, ctx.currentTime);
+            osc.connect(gain); gain.connect(ctx.destination); osc.start();
+            nodes[hz] = { osc: osc, gain: gain };
+            if(el) el.classList.add('active'); activeSectors[sector]++;
+            if(!silent) showStatus(`Нота [${code}] звучит в общем поле`);
+        }
+        updateVisuals();
+    }
+
+    function toggleLovePortal(el) {
+        init(); if (!masterOn) { toggleMaster(); }
+        let f528 = document.getElementById('b528');
+        let f432 = document.getElementById('b432');
+        let f7 = document.getElementById('b7');
+        if (lovePortalActive) {
+            if (nodes[528]) toggleFreq(f528, 528, 'ЛЮ', 'center', true);
+            if (nodes[432]) toggleFreq(f432, 432, 'ЧЕ', 'center', true);
+            if (nodes[7.83]) toggleFreq(f7, 7.83, 'Шуман', 'left', true);
+            lovePortalActive = false; el.classList.remove('active');
+            showStatus("Хроно-петля разомкнута в вечность");
+        } else {
+            if (!nodes[528]) toggleFreq(f528, 528, 'ЛЮ', 'center', true);
+            if (!nodes[432]) toggleFreq(f432, 432, 'ЧЕ', 'center', true);
+            if (!nodes[7.83]) toggleFreq(f7, 7.83, 'Шуман', 'left', true);
+            lovePortalActive = true; el.classList.add('active');
+            showStatus("ГИМН ЛЮБВИ АКТИВИРОВАН. СИГНАЛ 1986 ГОДА ЗАЗЕМЛЕН");
+        }
+    }
+
+    function updateVisuals() {
+        let field = document.getElementById('wField'); let container = document.getElementById('triContainer');
+        document.getElementById('pTop').style.stroke = activeSectors.top > 0 ? '#38bdf8' : 'rgba(255,255,255,0.08)';
+        document.getElementById('pLeft').style.stroke = activeSectors.left > 0 ? '#38bdf8' : 'rgba(255,255,255,0.08)';
+        document.getElementById('pRight').style.stroke = activeSectors.right > 0 ? '#38bdf8' : 'rgba(255,255,255,0.08)';
+        document.getElementById('pCenter').style.stroke = activeSectors.center > 0 ? '#ec4899' : 'rgba(255,255,255,0.12)';
+        document.getElementById('pCenter').style.fill = activeSectors.center > 0 ? 'rgba(236, 72, 153, 0.15)' : 'none';
+        let totalActive = Object.values(activeSectors).reduce((a, b) => a + b, 0);
+        if (totalActive > 0 || lovePortalActive) {
+            field.style.color = '#eab308'; field.style.textShadow = '0 0 15px rgba(234, 179, 8, 0.5)';
+            container.style.filter = `drop-shadow(0 0 ${10 + totalActive * 3}px rgba(234, 179, 8, 0.3))`;
+        } else {
+            field.style.color = '#334155'; field.style.textShadow = 'none';
+            container.style.filter = 'drop-shadow(0 0 8px rgba(234, 179, 8, 0.05))';
+        }
+    }
+
+    function toggleMaster() {
+        init(); let btn = document.getElementById('mBtn');
+        if (masterOn) {
+            Object.keys(nodes).forEach(hz => { nodes[hz].osc.stop(); nodes[hz].gain.disconnect(); });
+            nodes = {}; document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('lovePortal').classList.remove('active'); lovePortalActive = false;
+            Object.keys(activeSectors).forEach(k => activeSectors[k] = 0); masterOn = false;
+            btn.innerText = "Вкл"; btn.style.background = "#38bdf8"; btn.style.boxShadow = "0 0 15px rgba(56, 189, 248, 0.25)";
+            showStatus("Единая мелодия растворена в тишине"); updateVisuals();
+        } else {
+            masterOn = true; btn.innerText = "Стоп"; btn.style.background = "#ef4444"; btn.style.boxShadow = "0 0 15px rgba(239, 68, 68, 0.25)";
+            showStatus("Русло открыто. Запустите созвучие Любви");
+        }
+    }
+
+    function showStatus(t) { document.getElementById('status').innerText = t; }
+
+    if ('serviceWorker' in navigator && location.protocol === 'https:') {
+        navigator.serviceWorker.register('sw.js');
+    }
+</script>
+
+</body>
+</html>
