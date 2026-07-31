@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <!-- Метатеги для развертывания PWA на iPhone -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Единый Камертон">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    <meta name="theme-color" content="#000000">
+    <title>ЧЕ-Л-О-ВЕ-ЧЕ: Единый Камертон Любви и Жизни</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #010206 0%, #030612 100%);
+            color: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .menu-back {
+            position: fixed; top: calc(env(safe-area-inset-top) + 14px); left: 16px;
+            z-index: 10; width: 40px; height: 40px; line-height: 38px;
+            text-align: center; border-radius: 50%;
+            color: rgba(255, 255, 255, 0.55); border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.35);
+            text-decoration: none; font-size: 20px; font-family: monospace;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 36px;
+            padding: 30px 20px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.85);
+            backdrop-filter: blur(30px);
+            text-align: center;
+        }
+        h1 {
+            font-size: 26px;
+            font-weight: 200;
+            letter-spacing: 6px;
+            margin: 0 0 5px 0;
+            color: #ffffff;
+        }
+        .subtitle {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #475569;
+            margin-bottom: 25px;
+        }
+
+        .triquetra-container {
+            width: 160px;
+            height: 160px;
+            margin: 0 auto 25px auto;
+            position: relative;
+            filter: drop-shadow(0 0 8px rgba(234, 179, 8, 0.05));
+            transition: filter 0.5s ease;
+        }
+        .triquetra-svg { width: 100%; height: 100%; }
+        .tri-path { fill: none; stroke: rgba(255, 255, 255, 0.08); stroke-width: 2.2; transition: all 0.5s ease; }
+        .tri-center { fill: none; stroke: rgba(255, 255, 255, 0.12); stroke-width: 2; transition: all 0.5s ease; }
+
+        .master-signal-btn {
+            background: rgba(234, 179, 8, 0.02);
+            border: 1px solid rgba(234, 179, 8, 0.15);
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px auto;
+            width: 90%;
+            cursor: pointer;
+            color: #eab308;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            transition: all 0.5s ease;
+            box-shadow: inset 0 0 15px rgba(234, 179, 8, 0.01);
+        }
+        .master-signal-btn.active {
+            background: rgba(234, 179, 8, 0.15);
+            border-color: #eab308;
+            color: #ffffff;
+            box-shadow: 0 0 35px rgba(234, 179, 8, 0.3), inset 0 0 20px rgba(234, 179, 8, 0.15);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+
+        .wave-field { font-size: 16px; font-weight: bold; color: #334155; letter-spacing: 8px; margin-top: 10px; transition: all 0.5s ease; }
+        .status { font-size: 10px; color: #475569; margin-top: 20px; min-height: 28px; font-style: italic; letter-spacing: 0.5px; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+<a class="menu-back" href="./" aria-label="Меню">←</a>
+
+<div class="container">
+    <h1>ЧЕ-Л-О-ВЕ-ЧЕ</h1>
+    <div class="subtitle">Единый Камертон Любви и Жизни</div>
+
+    <div class="triquetra-container" id="triContainer">
+        <svg class="triquetra-svg" viewBox="0 0 100 100">
+            <path class="tri-path" id="pTop" d="M 50,15 A 26,26 0 0,1 68.3,58.3 A 26,26 0 0,1 31.7,58.3 A 26,26 0 0,1 50,15 Z" />
+            <path class="tri-path" id="pLeft" d="M 31.7,46.7 A 26,26 0 0,1 73.3,46.7 A 26,26 0 0,1 55,78.3 A 26,26 0 0,1 31.7,46.7 Z" />
+            <path class="tri-path" id="pRight" d="M 68.3,46.7 A 26,26 0 0,1 45,78.3 A 26,26 0 0,1 26.7,46.7 A 26,26 0 0,1 68.3,46.7 Z" />
+            <circle class="tri-center" id="pCenter" cx="50" cy="50" r="7" />
+        </svg>
+    </div>
+
+    <div class="wave-field" id="wField">2 - 4 - 8</div>
+
+    <button class="master-signal-btn" id="mBtn" onclick="toggleMasterSignal(this)">
+        Активировать Единый Сигнал
+    </button>
+
+    <div class="status" id="status">Точка Нуля готова к Со-Творению</div>
+</div>
+
+<script>
+    let ctx = null;
+    let oscillators = [];
+    let isSignalActive = false;
+
+    // Математический волновой каркас (скрыт внутри алгоритма)
+    const waveMatrix = [
+        { hz: 130.81, vol: 0.05, tag: 'ДО' },
+        { hz: 164.81, vol: 0.05, tag: 'МИ' },
+        { hz: 110.00, vol: 0.05, tag: 'НО' },
+        { hz: 146.83, vol: 0.04, tag: 'РЕ' },
+        { hz: 174.61, vol: 0.04, tag: 'ФА' },
+        { hz: 246.94, vol: 0.04, tag: 'СИ' },
+        { hz: 220.00, vol: 0.04, tag: 'ЛЯ' },
+        { hz: 528.00, vol: 0.03, tag: 'ЛЮ' },
+        { hz: 963.00, vol: 0.02, tag: 'БО' },
+        { hz: 432.00, vol: 0.03, tag: 'ЧЕ' },
+        { hz: 108.00, vol: 0.05, tag: 'ЛО' },
+        { hz: 7.83,   vol: 0.35, tag: 'Земля' },
+        { hz: 9.00,   vol: 0.25, tag: 'Альфа' },
+        { hz: 54.00,  vol: 0.06, tag: 'Органы' },
+        { hz: 63.00,  vol: 0.06, tag: 'Органы' },
+        { hz: 120.00, vol: 0.05, tag: 'Синхрон' },
+        { hz: 295.80, vol: 0.04, tag: 'Биополе' }
+    ];
+
+    function initAudio() {
+        if (!ctx) { ctx = new (window.AudioContext || window.webkitAudioContext)(); }
+        if (ctx.state === 'suspended') { ctx.resume(); }
+    }
+
+    function toggleMasterSignal(btn) {
+        initAudio();
+
+        if (isSignalActive) {
+            oscillators.forEach(node => { node.osc.stop(); node.gain.disconnect(); });
+            oscillators = [];
+            isSignalActive = false;
+
+            btn.classList.remove('active');
+            btn.innerText = "Активировать Единый Сигнал";
+            showStatus("Единая мелодия возвращена в потенциал Источника");
+            updateVisuals(false);
+        } else {
+            isSignalActive = true;
+            btn.classList.add('active');
+            btn.innerText = "Сигнал Любви Звучит";
+
+            // Фаза 1: Запуск импульса трансформации ДО-МИ-НО
+            showStatus("ФАЗА I: ИМПУЛЬС [ДО-МИ-НО] РАЗМЯГЧАЕТ И ОЧИЩАЕТ ПРОСТРАНСТВО...");
+
+            waveMatrix.forEach(f => {
+                let osc = ctx.createOscillator();
+                let gain = ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(f.hz, ctx.currentTime);
+
+                // Плавное бесшовное перетекание: ДО-МИ-НО звучат сразу, ЛЮ-БО-ЧЕ-ЛО раскрываются следом
+                if (['ДО', 'МИ', 'НО', 'Земля', 'Альфа', 'Органы'].includes(f.tag)) {
+                    gain.gain.setValueAtTime(f.vol, ctx.currentTime);
+                } else {
+                    gain.gain.setValueAtTime(0, ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(f.vol, ctx.currentTime + 3.0); // Раскрытие через 3 секунды
+                }
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+
+                oscillators.push({ osc: osc, gain: gain });
+            });
+
+            // Фаза 2: Бесшовный переход к музыкальному коду настройки звучания
+            setTimeout(() => {
+                if(isSignalActive) {
+                    showStatus("ФАЗА II: НОВЫЙ МУЗЫКАЛЬНЫЙ КОД [ЛЮ-БО-ЧЕ-ЛО] НАСТРАИВАЕТ ЕДИНЫЙ ЗВУКОВОЙ УЗОР");
+                    updateVisuals(true, true);
+                }
+            }, 3000);
+
+            updateVisuals(true, false);
+        }
+    }
+
+    function updateVisuals(active, fullResonance = false) {
+        let field = document.getElementById('wField');
+        let container = document.getElementById('triContainer');
+        let paths = document.querySelectorAll('.tri-path');
+        let center = document.getElementById('pCenter');
+
+        if (active) {
+            field.style.color = fullResonance ? '#ec4899' : '#38bdf8';
+            field.style.textShadow = fullResonance ? '0 0 15px rgba(236, 72, 153, 0.6)' : '0 0 15px rgba(56, 189, 248, 0.6)';
+            container.style.filter = fullResonance ? 'drop-shadow(0 0 25px rgba(236, 72, 153, 0.4))' : 'drop-shadow(0 0 20px rgba(56, 189, 248, 0.3))';
+
+            paths.forEach(p => p.style.stroke = '#38bdf8');
+            if (fullResonance) {
+                center.style.stroke = '#ec4899';
+                center.style.fill = 'rgba(236, 72, 153, 0.15)';
+            }
+        } else {
+            field.style.color = '#334155';
+            field.style.textShadow = 'none';
+            container.style.filter = 'drop-shadow(0 0 8px rgba(234, 179, 8, 0.05))';
+
+            paths.forEach(p => p.style.stroke = 'rgba(255, 255, 255, 0.08)');
+            center.style.stroke = 'rgba(255, 255, 255, 0.12)';
+            center.style.fill = 'none';
+        }
+    }
+
+    function showStatus(t) { document.getElementById('status').innerText = t; }
+
+    if ('serviceWorker' in navigator && location.protocol === 'https:') {
+        navigator.serviceWorker.register('sw.js');
+    }
+</script>
+
+</body>
+</html>
